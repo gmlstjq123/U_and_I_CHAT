@@ -12,5 +12,6 @@ class RetrofitInstance {
                 .build()
         }
         val userApi = retrofit.create(UserApi::class.java)
+        val myPageApi = retrofit.create(MyPageApi::class.java)
     }
 }
