@@ -16,7 +16,7 @@ import java.io.ByteArrayOutputStream
 class MypageActivity : AppCompatActivity() {
 
     lateinit var profileImage : ImageView
-
+    // Fragment로 대체하여 삭제 예정
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_mypage)
