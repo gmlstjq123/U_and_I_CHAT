@@ -24,6 +24,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : AppCompatActivity() {
 
@@ -79,7 +80,11 @@ class LoginActivity : AppCompatActivity() {
                                 } else {
                                     // 로그인 실패 처리
                                     Log.d("LoginActivity", "로그인 실패")
-                                    Toast.makeText(this@LoginActivity, "이메일 또는 비밀번호를 확인해주세요", Toast.LENGTH_SHORT).show()
+                                    val message = response.message
+                                    Log.d("JoinActivity", message)
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(this@LoginActivity, message, Toast.LENGTH_SHORT).show()
+                                    }
                                 }
                             }
                         } else {

@@ -90,8 +90,10 @@ class JoinActivity : AppCompatActivity() {
                                     }
                                 } else {
                                     Log.d("JoinActivity", "회원가입 실패")
+                                    val message = response.message
+                                    Log.d("JoinActivity", message)
                                     withContext(Dispatchers.Main) {
-                                        Toast.makeText(this@JoinActivity, "입력값을 확인해주세요", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(this@JoinActivity, message, Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }

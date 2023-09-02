@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.findNavController
 import com.chrome.chattingapp.mypage.NickNameActivity
+import com.chrome.chattingapp.mypage.PasswordActivity
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
@@ -47,6 +48,12 @@ class MyPageFragment : Fragment() {
         val nickName = view.findViewById<Button>(R.id.nickNameBtn)
         nickName.setOnClickListener {
             val intent = Intent(requireActivity(), NickNameActivity::class.java)
+            startActivity(intent)
+        }
+
+        val password = view.findViewById<Button>(R.id.passwordBtn)
+        password.setOnClickListener {
+            val intent = Intent(requireActivity(), PasswordActivity::class.java)
             startActivity(intent)
         }
 
