@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="20dp"
+        android:text="로그아웃 하시겠습니까?"
+        android:textSize="30sp"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:background="@android:color/transparent"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="30dp"
+            android:background="@drawable/main_border"
+            android:text="OK"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@+id/cancel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/main_border"
+            android:text="Cancel"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ok"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_weight="1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

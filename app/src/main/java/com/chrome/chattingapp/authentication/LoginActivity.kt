@@ -42,6 +42,7 @@ class LoginActivity : AppCompatActivity() {
             val email = findViewById<TextInputEditText>(R.id.email)
             val password = findViewById<TextInputEditText>(R.id.password)
             val uid = FirebaseAuthUtils.getUid()
+            Log.d("uid", uid)
             val postLoginReq = PostLoginReq(uid, email.text.toString(), password.text.toString())
 
             if(email.text.toString().isEmpty()) {

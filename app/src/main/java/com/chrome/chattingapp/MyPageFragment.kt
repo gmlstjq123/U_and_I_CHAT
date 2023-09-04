@@ -1,5 +1,6 @@
 package com.chrome.chattingapp
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -11,28 +12,33 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.findNavController
+import com.chrome.chattingapp.api.BaseResponse
+import com.chrome.chattingapp.api.RetrofitInstance
+import com.chrome.chattingapp.api.dto.GetUserRes
+import com.chrome.chattingapp.authentication.LoginActivity
 import com.chrome.chattingapp.mypage.NickNameActivity
 import com.chrome.chattingapp.mypage.PasswordActivity
+import com.chrome.chattingapp.mypage.ProfileActivity
+import com.chrome.chattingapp.utils.FirebaseAuthUtils
+import com.chrome.chattingapp.utils.FirebaseRef
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [MyPageFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MyPageFragment : Fragment() {
-
-    lateinit var profileImage : ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +63,58 @@ class MyPageFragment : Fragment() {
             startActivity(intent)
         }
 
+        val profile = view.findViewById<Button>(R.id.profileBtn)
+        profile.setOnClickListener {
+            val intent = Intent(requireActivity(), ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
+        val logout = view.findViewById<Button>(R.id.logoutBtn)
+        logout.setOnClickListener {
+            val dialogView = LayoutInflater.from(requireActivity()).inflate(R.layout.logout_dialog, null)
+            val builder = AlertDialog.Builder(requireActivity())
+                .setView(dialogView)
+                .setTitle("로그아웃")
+            val alertDialog = builder.show()
+            val ok = alertDialog.findViewById<Button>(R.id.ok)
+            ok.setOnClickListener {
+                getAccessToken { accessToken ->
+                    if (accessToken.isNotEmpty()) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val response = logoutUser(accessToken)
+
+                            if (response.isSuccess) {
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        requireActivity(), "로그아웃 되었습니다.", Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    val intent = Intent(requireActivity(), LoginActivity::class.java)
+                                    startActivity(intent)
+                                }
+                            } else {
+                                Log.d("MyPageFragment", "로그아웃 실패")
+                                val message = response.message
+                                Log.d("PasswordActivity", message)
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        requireActivity(), message, Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                    } else {
+                        Log.e("MyPageFragment", "Invalid Token")
+                    }
+                }
+            }
+
+            val cancel = alertDialog.findViewById<Button>(R.id.cancel)
+            cancel.setOnClickListener {
+                alertDialog.dismiss()
+            }
+        }
+
         val freind = view.findViewById<ImageView>(R.id.freind)
         freind.setOnClickListener {
             it.findNavController().navigate(R.id.action_myPageFragment_to_userListFragment)
@@ -67,38 +125,26 @@ class MyPageFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myPageFragment_to_chatListFragment)
         }
 
-        //        profileImage = view.findViewById<ImageView>(R.id.profile)
-//
-//        val profileBtn = view.findViewById<Button>(R.id.profileBtn)
-//
-//        val getAction = registerForActivityResult(
-//            ActivityResultContracts.GetContent(),
-//            ActivityResultCallback { uri ->
-//                profileImage.setImageURI(uri)
-//            }
-//        )
-//
-//        profileBtn.setOnClickListener {
-//            getAction.launch("image/*")
-//        }
         return view
     }
 
-//    private fun uploadImage(uid: String) {
-//        val storage = Firebase.storage
-//        val storageRef = storage.reference.child(uid + ".jpeg")
-//        profileImage.isDuplicateParentStateEnabled = true
-//        profileImage.buildDrawingCache()
-//
-//        val bitmap = (profileImage.drawable as BitmapDrawable).bitmap
-//        val baos = ByteArrayOutputStream()
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-//
-//        val data = baos.toByteArray()
-//        var uploadTask = storageRef.putBytes(data)
-//        uploadTask.addOnFailureListener{
-//        }.addOnSuccessListener { taskSnapshot ->
-//            Log.d("Image", Firebase.storage.reference.child(uid + ".jpeg").downloadUrl.toString())
-//        }
-//    }
+    private suspend fun logoutUser(accessToken : String): BaseResponse<String> {
+        return RetrofitInstance.myPageApi.logoutUser(accessToken)
+    }
+
+    private fun getAccessToken(callback: (String) -> Unit) {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val data = dataSnapshot.getValue(com.chrome.chattingapp.authentication.UserInfo::class.java)
+                val accessToken = data?.accessToken ?: ""
+                callback(accessToken)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w("NickNameActivity", "onCancelled", databaseError.toException())
+            }
+        }
+
+        FirebaseRef.userInfo.child(FirebaseAuthUtils.getUid()).addListenerForSingleValueEvent(postListener)
+    }
 }
