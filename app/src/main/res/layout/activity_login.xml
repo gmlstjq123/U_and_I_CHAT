@@ -69,11 +69,21 @@
         <Button
             android:id="@+id/loginBtn"
             android:text="로그인"
-            android:layout_marginTop="90dp"
+            android:layout_marginTop="60dp"
             android:layout_marginHorizontal="40dp"
             android:background="@color/skyBlue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/noAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="아직 계정이 없으신가요?"
+            android:textSize="15sp"
+            android:textColor="#000000"
+            android:layout_marginTop="20dp"
+            android:gravity="center"/>
 
     </LinearLayout>
 </ScrollView>

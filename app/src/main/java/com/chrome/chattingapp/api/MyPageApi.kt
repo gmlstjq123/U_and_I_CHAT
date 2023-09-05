@@ -8,6 +8,7 @@ import com.chrome.chattingapp.api.dto.PostUserReq
 import com.chrome.chattingapp.api.dto.PostUserRes
 import okhttp3.MultipartBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
@@ -47,5 +48,11 @@ interface MyPageApi {
     @PATCH("/users/noProfile")
     suspend fun modifyNoProfile(
         @Header("Authorization") accessToken : String
+    ): BaseResponse<String>
+
+    @DELETE("/users")
+    suspend fun deleteUser(
+        @Header("Authorization") accessToken : String,
+        @Query("agreement") agreement : String
     ): BaseResponse<String>
 }

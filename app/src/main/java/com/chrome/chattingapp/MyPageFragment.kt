@@ -23,6 +23,7 @@ import com.chrome.chattingapp.authentication.LoginActivity
 import com.chrome.chattingapp.mypage.NickNameActivity
 import com.chrome.chattingapp.mypage.PasswordActivity
 import com.chrome.chattingapp.mypage.ProfileActivity
+import com.chrome.chattingapp.mypage.WithdrawalActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
 import com.google.firebase.auth.FirebaseAuth
@@ -113,6 +114,12 @@ class MyPageFragment : Fragment() {
             cancel.setOnClickListener {
                 alertDialog.dismiss()
             }
+        }
+
+        val quit = view.findViewById<Button>(R.id.quitBtn)
+        quit.setOnClickListener {
+            val intent = Intent(requireActivity(), WithdrawalActivity::class.java)
+            startActivity(intent)
         }
 
         val freind = view.findViewById<ImageView>(R.id.freind)

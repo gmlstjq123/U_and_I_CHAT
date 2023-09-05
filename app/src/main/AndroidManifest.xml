@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".mypage.WithdrawalActivity"
+            android:exported="false" />
+        <activity
             android:name=".mypage.PasswordActivity"
             android:exported="false" />
         <activity

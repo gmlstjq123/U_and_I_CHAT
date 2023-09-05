@@ -42,7 +42,6 @@ class JoinActivity : AppCompatActivity() {
         setContentView(R.layout.activity_join)
 
         auth = Firebase.auth
-        val uid = auth.currentUser!!.uid
 
         val joinBtn = findViewById<Button>(R.id.joinBtn)
         joinBtn.setOnClickListener {
@@ -81,7 +80,6 @@ class JoinActivity : AppCompatActivity() {
                             CoroutineScope(Dispatchers.IO).launch {
                                 val response = createUser(postUserReq)
                                 if (response.isSuccess) {
-                                    Log.d("JoinActivity", "회원가입 완료: " + uid)
                                     // UI 업데이트는 Dispatchers.Main을 사용하여 메인 스레드에서 실행
                                     withContext(Dispatchers.Main) {
                                         Toast.makeText(this@JoinActivity, "가입을 환영합니다!", Toast.LENGTH_SHORT).show()

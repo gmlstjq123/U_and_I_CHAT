@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import com.chrome.chattingapp.MainActivity
 import com.chrome.chattingapp.R
@@ -36,8 +37,13 @@ class LoginActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
-        val loginBtn = findViewById<Button>(R.id.loginBtn)
+        val noAccountBtn = findViewById<TextView>(R.id.noAccount)
+        noAccountBtn.setOnClickListener {
+            val intent = Intent(this, JoinActivity::class.java)
+            startActivity(intent)
+        }
 
+        val loginBtn = findViewById<Button>(R.id.loginBtn)
         loginBtn.setOnClickListener {
             val email = findViewById<TextInputEditText>(R.id.email)
             val password = findViewById<TextInputEditText>(R.id.password)
