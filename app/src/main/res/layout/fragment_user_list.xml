@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_border"
+    android:background="@drawable/list_border"
     android:orientation="vertical"
     tools:context=".UserListFragment">
 
@@ -13,17 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textColor="#000000"
+        android:background="@drawable/list_border"
+        android:padding="5dp"
         android:text="내 프로필"
+        android:layout_marginHorizontal="10dp"
         android:textStyle="bold"
         android:textSize="25sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"/>
+        android:layout_marginTop="10dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/main_border">
+        android:layout_marginHorizontal="10dp"
+        android:background="@drawable/list_border">
 
         <ImageView
             android:id="@+id/profileArea"
@@ -49,18 +52,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="친구 프로필"
+        android:layout_marginHorizontal="10dp"
+        android:padding="5dp"
+        android:background="@drawable/list_border"
         android:textColor="#000000"
         android:textStyle="bold"
         android:textSize="25sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"/>
+        android:layout_marginTop="10dp"/>
 
     <ListView
         android:id="@+id/freindListView"
         android:layout_width="match_parent"
+        android:layout_marginHorizontal="10dp"
         android:layout_height="0dp"
-        android:layout_weight="1"
-    />
+        android:layout_weight="1"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

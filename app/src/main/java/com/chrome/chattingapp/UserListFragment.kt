@@ -1,5 +1,6 @@
 package com.chrome.chattingapp
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -16,6 +17,7 @@ import com.chrome.chattingapp.api.BaseResponse
 import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.api.dto.UserProfile
+import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
 import com.google.firebase.database.DataSnapshot
@@ -77,6 +79,14 @@ class UserListFragment : Fragment() {
                             listview.adapter = adapter
                             adapter.notifyDataSetChanged()
                             Log.d("UserProfileList", userProfileList.toString())
+                            listview.setOnItemClickListener { parent, view, position, id ->
+                                val imgUrl = userProfileList!![position].imgUrl
+                                val nickName = userProfileList!![position].nickName
+                                val intent = Intent(requireActivity(), UserDetailActivity::class.java)
+                                intent.putExtra("imgUrl", imgUrl)
+                                intent.putExtra("nickName", nickName)
+                                startActivity(intent)
+                            }
                         }
                     } else {
                         userProfileList = emptyList() // 초기화 실패 시 빈 리스트로 설정
@@ -90,7 +100,6 @@ class UserListFragment : Fragment() {
             }
         }
 
-        // 나머지 코드는 그대로 유지
         val chat = view.findViewById<ImageView>(R.id.chat)
         chat.setOnClickListener {
             it.findNavController().navigate(R.id.action_userListFragment_to_chatListFragment)
@@ -127,3 +136,4 @@ class UserListFragment : Fragment() {
         FirebaseRef.userInfo.child(FirebaseAuthUtils.getUid()).addListenerForSingleValueEvent(postListener)
     }
 }
+

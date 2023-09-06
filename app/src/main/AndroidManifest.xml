@@ -16,6 +16,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".chat.ChatRoomActivity"
+            android:exported="false" />
+        <activity
+            android:name=".friend.ProfileImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".friend.UserDetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".mypage.WithdrawalActivity"
             android:exported="false" />
         <activity
