@@ -1,6 +1,7 @@
 package com.chrome.chattingapp
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -17,6 +18,8 @@ import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.chat.ChatRoomAdapter
 import com.chrome.chattingapp.chat.ChatRoom
+import com.chrome.chattingapp.chat.ChatRoomActivity
+import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
 import com.google.android.material.textfield.TextInputEditText
@@ -71,6 +74,17 @@ class ChatListFragment : Fragment() {
 
         getChatRoomList()
 
+        listView.setOnItemClickListener { parent, view, position, id ->
+            val chatRoomId = chatRoomList!![position].chatRoomId
+            val chatRoomName = chatRoomList!![position].roomName
+            val userList = chatRoomList!![position].userList
+            val intent = Intent(requireActivity(), ChatRoomActivity::class.java)
+            intent.putExtra("chatRoomId", chatRoomId)
+            intent.putExtra("chatRoomName", chatRoomName)
+            intent.putExtra("userList", userList)
+            startActivity(intent)
+        }
+
         val plusBtn = view.findViewById<ImageView>(R.id.plus)
         plusBtn.setOnClickListener {
             showDialog()
@@ -101,6 +115,9 @@ class ChatListFragment : Fragment() {
             val roomNameStr = roomName.text.toString()
             if(roomNameStr.isEmpty()) {
                 Toast.makeText(requireActivity(), "채팅방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
+            }
+            if(roomNameStr.length > 20) {
+                Toast.makeText(requireActivity(), "채팅방 이름은 12글자 미만으로 입력해주세요", Toast.LENGTH_SHORT).show()
             }
             else {
                 getAccessToken { accessToken ->
