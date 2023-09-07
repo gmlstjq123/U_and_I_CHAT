@@ -8,16 +8,10 @@
     android:layout_height="match_parent"
     tools:context=".chat.ChatRoomActivity">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </ScrollView>
-
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
-        android:layout_height="110dp"
+        android:layout_height="145dp"
         android:background="@drawable/main_border"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,10 +46,11 @@
         <TextView
             android:id="@+id/nickNameList"
             android:layout_width="220dp"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="55dp"
+            android:maxWidth="220dp"
             android:text="User List"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@+id/roomName"
@@ -65,14 +60,25 @@
 
         <Button
             android:id="@+id/invite"
-            android:layout_width="70dp"
+            android:layout_width="75dp"
             android:layout_height="40dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="90dp"
             android:background="@color/skyBlue"
             android:text="초대"
             android:textSize="20sp" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/participants"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/participants"
+        android:textSize="25sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/chatRoomName"
@@ -89,6 +95,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/linearLayout3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -116,6 +123,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+
         <ImageView
             android:id="@+id/send"
             android:layout_width="50dp"
@@ -125,5 +133,28 @@
             android:src="@drawable/send" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+        app:layout_constraintVertical_bias="1.0"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messageRV"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
+            app:layout_constraintVertical_bias="1.0"/>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

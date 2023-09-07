@@ -79,6 +79,7 @@ class ChatListFragment : Fragment() {
             val chatRoomName = chatRoomList!![position].roomName
             val userList = chatRoomList!![position].userList
             val intent = Intent(requireActivity(), ChatRoomActivity::class.java)
+
             intent.putExtra("chatRoomId", chatRoomId)
             intent.putExtra("chatRoomName", chatRoomName)
             intent.putExtra("userList", userList)
@@ -116,7 +117,7 @@ class ChatListFragment : Fragment() {
             if(roomNameStr.isEmpty()) {
                 Toast.makeText(requireActivity(), "채팅방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             }
-            if(roomNameStr.length > 20) {
+            if(roomNameStr.length > 15) {
                 Toast.makeText(requireActivity(), "채팅방 이름은 12글자 미만으로 입력해주세요", Toast.LENGTH_SHORT).show()
             }
             else {
@@ -126,8 +127,6 @@ class ChatListFragment : Fragment() {
                             val response = createChatRoom(accessToken, roomNameStr)
                             if (response.isSuccess) {
                                 Log.d("ChatListFragment", response.toString())
-                                val uidList = mutableListOf<String>()
-                                uidList.add(FirebaseAuthUtils.getUid())
                                 val roomId = response.result
                                 val chatRoom = ChatRoom(roomId!!, roomNameStr, nickName)
                                 Log.d("ChatRoom", chatRoom.toString())

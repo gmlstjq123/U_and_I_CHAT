@@ -1,22 +1,22 @@
-package com.chrome.chattingapp
+package com.chrome.chattingapp.chat
 
 import android.content.Intent
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
-import androidx.navigation.findNavController
+import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.chrome.chattingapp.ListViewAdapter
+import com.chrome.chattingapp.R
 import com.chrome.chattingapp.api.BaseResponse
 import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.api.dto.UserProfile
+import com.chrome.chattingapp.chat.dto.AddUserReq
 import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
@@ -28,42 +28,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class UserListFragment : Fragment() {
+class InviteActivity : AppCompatActivity() {
 
     // userProfileList를 nullable로 선언
     private var userProfileList: List<UserProfile>? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_user_list, container, false)
-        lateinit var nickname: String
-        val myProfile = view.findViewById<ImageView>(R.id.profileArea)
-        val myNickName = view.findViewById<TextView>(R.id.nickNameArea)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_invite)
 
-        // 내 프로필
-        CoroutineScope(Dispatchers.IO).launch {
-            val response = getUserInfo(FirebaseAuthUtils.getUid())
-            if (response.isSuccess) {
-                nickname = response.result?.nickName.toString()
-                withContext(Dispatchers.Main) {
-                    myNickName.text = nickname
-                }
-                if (response.result?.imgUrl != null) {
-                    val profileUrl = response.result?.imgUrl
-                    val profileUri = Uri.parse(profileUrl)
-                    withContext(Dispatchers.Main) {
-                        Glide.with(requireActivity())
-                            .load(profileUri)
-                            .into(myProfile)
-                    }
-                }
-            } else {
-                Log.d("UserListFragment", "유저의 정보를 불러오지 못함")
-            }
-        }
+        val chatRoomId = intent.getStringExtra("chatRoomId")
+        val chatRoomName = intent.getStringExtra("chatRoomName")
+        val nickNameList = intent.getStringExtra("nickNameList")
 
         // userProfileList 초기화는 API 응답 이후에 수행
         getAccessToken { accessToken ->
@@ -75,18 +51,39 @@ class UserListFragment : Fragment() {
                         Log.d("UserProfileList", userProfileList.toString())
                         withContext(Dispatchers.Main) {
                             // UI 업데이트는 Main 스레드에서 수행
-                            val adapter = ListViewAdapter(requireContext(), userProfileList ?: emptyList())
-                            val listview = view.findViewById<ListView>(R.id.freindListView)
+                            val adapter = ListViewAdapter(this@InviteActivity, userProfileList ?: emptyList())
+                            val listview = findViewById<ListView>(R.id.inviteListView)
                             listview.adapter = adapter
                             adapter.notifyDataSetChanged()
                             Log.d("UserProfileList", userProfileList.toString())
                             listview.setOnItemClickListener { parent, view, position, id ->
-                                val imgUrl = userProfileList!![position].imgUrl
-                                val nickName = userProfileList!![position].nickName
-                                val intent = Intent(requireActivity(), UserDetailActivity::class.java)
-                                intent.putExtra("imgUrl", imgUrl)
-                                intent.putExtra("nickName", nickName)
-                                startActivity(intent)
+                                val newNickNameList = nickNameList + ", " + userProfileList!![position].nickName
+                                val chatRoom = ChatRoom(chatRoomId, chatRoomName, newNickNameList)
+                                Log.d("ChatRoom", chatRoom.toString())
+                                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId!!).setValue(chatRoom)
+
+                                val intent = Intent(this@InviteActivity, ChatRoomActivity::class.java)
+                                intent.putExtra("chatRoomId", chatRoomId)
+                                intent.putExtra("chatRoomName", chatRoomName)
+                                intent.putExtra("userList", newNickNameList)
+
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    val addUserReq = AddUserReq(userProfileList!![position].uid, chatRoomId)
+                                    val response = addUser(addUserReq)
+                                    if (response.isSuccess) {
+                                        val nickName = response.result
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(this@InviteActivity, nickName + " 님을 초대하였습니다.", Toast.LENGTH_SHORT).show()
+                                        }
+                                        startActivity(intent)
+                                    } else {
+                                        val message = response.message
+                                        Log.d("InviteActivity", message)
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(this@InviteActivity, message, Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
                             }
                         }
                     } else {
@@ -100,25 +97,14 @@ class UserListFragment : Fragment() {
                 Log.e("UserListFragment", "Invalid Token")
             }
         }
-
-        val chat = view.findViewById<ImageView>(R.id.chat)
-        chat.setOnClickListener {
-            it.findNavController().navigate(R.id.action_userListFragment_to_chatListFragment)
-        }
-
-        val mypage = view.findViewById<ImageView>(R.id.mypage)
-        mypage.setOnClickListener {
-            it.findNavController().navigate(R.id.action_userListFragment_to_myPageFragment)
-        }
-        return view
-    }
-
-    private suspend fun getUserInfo(uid: String): BaseResponse<GetUserRes> {
-        return RetrofitInstance.myPageApi.getUserInfo(uid)
     }
 
     private suspend fun getUsers(accessToken: String): BaseResponse<List<UserProfile>> {
         return RetrofitInstance.userApi.getUsers(accessToken)
+    }
+
+    private suspend fun addUser(addUserReq: AddUserReq) : BaseResponse<String> {
+        return RetrofitInstance.chatApi.addUser(addUserReq)
     }
 
     private fun getAccessToken(callback: (String) -> Unit) {
@@ -137,4 +123,3 @@ class UserListFragment : Fragment() {
         FirebaseRef.userInfo.child(FirebaseAuthUtils.getUid()).addListenerForSingleValueEvent(postListener)
     }
 }
-
