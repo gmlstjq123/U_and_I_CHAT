@@ -59,6 +59,7 @@ class InviteActivity : AppCompatActivity() {
                             listview.setOnItemClickListener { parent, view, position, id ->
                                 val newNickNameList = nickNameList + ", " + userProfileList!![position].nickName
                                 val chatRoom = ChatRoom(chatRoomId, chatRoomName, newNickNameList)
+                                val invitedUid = userProfileList!![position].uid
                                 Log.d("ChatRoom", chatRoom.toString())
                                 FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId!!).setValue(chatRoom)
 
@@ -66,6 +67,7 @@ class InviteActivity : AppCompatActivity() {
                                 intent.putExtra("chatRoomId", chatRoomId)
                                 intent.putExtra("chatRoomName", chatRoomName)
                                 intent.putExtra("userList", newNickNameList)
+                                intent.putExtra("invitedUid", invitedUid)
 
                                 CoroutineScope(Dispatchers.IO).launch {
                                     val addUserReq = AddUserReq(userProfileList!![position].uid, chatRoomId)
@@ -73,6 +75,7 @@ class InviteActivity : AppCompatActivity() {
                                     if (response.isSuccess) {
                                         val nickName = response.result
                                         withContext(Dispatchers.Main) {
+                                            FirebaseRef.chatRoom.child(invitedUid).child(chatRoomId!!).setValue(chatRoom)
                                             Toast.makeText(this@InviteActivity, nickName + " 님을 초대하였습니다.", Toast.LENGTH_SHORT).show()
                                         }
                                         startActivity(intent)

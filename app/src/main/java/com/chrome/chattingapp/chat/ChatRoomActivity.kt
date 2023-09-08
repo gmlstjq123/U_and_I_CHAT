@@ -35,6 +35,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
     lateinit var count : String
     lateinit var messageAdapter : MessageAdapter
+    lateinit var recyclerView : RecyclerView
     val messageList = mutableListOf<MessageModel>()
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -68,7 +69,7 @@ class ChatRoomActivity : AppCompatActivity() {
             }
         }
 
-        val recyclerView = findViewById<RecyclerView>(R.id.messageRV)
+        recyclerView = findViewById<RecyclerView>(R.id.messageRV)
         messageAdapter = MessageAdapter(this, messageList)
         recyclerView.adapter = messageAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -110,7 +111,7 @@ class ChatRoomActivity : AppCompatActivity() {
                     messageModel = MessageModel(myUid, myNickName, myProfileUrl, contents, sendTime)
                     FirebaseRef.message.child(chatRoomId!!).push().setValue(messageModel)
                 } else {
-                    Log.d("UserListFragment", "유저의 정보를 불러오지 못함")
+                    Log.d("ChatRoomActivity", "유저의 정보를 불러오지 못함")
                 }
             }
             message.text?.clear()
@@ -130,7 +131,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun getSendTime(): String {
         try {
             val localDateTime = LocalDateTime.now()
-            val dateTimeFormatter = DateTimeFormatter.ofPattern("a h:mm")
+            val dateTimeFormatter = DateTimeFormatter.ofPattern("M/d  h:mm  a")
             return localDateTime.format(dateTimeFormatter)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -145,11 +146,17 @@ class ChatRoomActivity : AppCompatActivity() {
                 val newMessages = mutableListOf<MessageModel>() // 새로운 메시지를 저장할 리스트 생성
                 for (datamModel in dataSnapshot.children) {
                     val messageModel = datamModel.getValue(MessageModel::class.java)
+                    if(messageModel!!.senderUid != FirebaseAuthUtils.getUid()) {
+                        messageModel.viewType = MessageModel.VIEW_TYPE_YOU
+                    }
                     newMessages.add(messageModel!!)
                 }
                 messageList.addAll(newMessages)
                 messageAdapter.notifyDataSetChanged()
                 Log.d("MessageList", messageList.toString())
+                recyclerView.post {
+                    recyclerView.scrollToPosition(recyclerView.adapter?.itemCount?.minus(1) ?: 0)
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

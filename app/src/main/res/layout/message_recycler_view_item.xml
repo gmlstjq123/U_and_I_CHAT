@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="95dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -14,14 +14,14 @@
             android:id="@+id/messageContentsArea"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="15dp"
+            android:layout_marginTop="35dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/message_box"
             android:ellipsize="end"
             android:maxWidth="230dp"
             android:padding="10dp"
             android:text="my text message"
-            android:textSize="25sp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toStartOf="@+id/messageProfileArea"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -29,21 +29,35 @@
             android:id="@+id/dateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
             android:layout_marginTop="5dp"
+            android:layout_marginEnd="15dp"
             android:text="9/7 7:01 AM"
-            android:textSize="15sp"
+            android:textSize="10sp"
             app:layout_constraintEnd_toStartOf="@+id/messageProfileArea"
             app:layout_constraintTop_toBottomOf="@+id/messageContentsArea" />
 
         <ImageView
             android:id="@+id/messageProfileArea"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_margin="15dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="15dp"
             android:src="@drawable/profile"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/messageNickName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="17dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="nickname"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/messageContentsArea"
+            app:layout_constraintEnd_toStartOf="@+id/messageProfileArea" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

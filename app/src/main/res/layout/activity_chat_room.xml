@@ -45,12 +45,12 @@
 
         <TextView
             android:id="@+id/nickNameList"
-            android:layout_width="220dp"
+            android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="20dp"
             android:layout_marginTop="55dp"
-            android:maxWidth="220dp"
+            android:maxWidth="170dp"
             android:text="User List"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="@+id/roomName"
@@ -109,15 +109,15 @@
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/message"
-                android:layout_width="330dp"
-                android:layout_height="50dp"
+                android:layout_width="280dp"
+                android:layout_height="40dp"
                 android:layout_marginLeft="13dp"
                 android:layout_marginBottom="10dp"
                 android:background="@drawable/main_border"
                 android:hint="텍스트를 입력하세요"
                 android:padding="5dp"
                 android:textColorHint="#808080"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -127,7 +127,7 @@
         <ImageView
             android:id="@+id/send"
             android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_marginLeft="10dp"
             android:src="@drawable/send" />

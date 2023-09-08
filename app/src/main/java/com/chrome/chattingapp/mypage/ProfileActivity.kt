@@ -69,6 +69,7 @@ class ProfileActivity : AppCompatActivity() {
             ActivityResultCallback { uri ->
                 profileImage.setImageURI(uri)
                 selectedImageUri = uri
+                Log.d("imageUri", selectedImageUri.toString())
             }
         )
 

@@ -117,7 +117,7 @@ class ChatListFragment : Fragment() {
             if(roomNameStr.isEmpty()) {
                 Toast.makeText(requireActivity(), "채팅방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             }
-            if(roomNameStr.length > 15) {
+            if(roomNameStr.length > 12) {
                 Toast.makeText(requireActivity(), "채팅방 이름은 12글자 미만으로 입력해주세요", Toast.LENGTH_SHORT).show()
             }
             else {
