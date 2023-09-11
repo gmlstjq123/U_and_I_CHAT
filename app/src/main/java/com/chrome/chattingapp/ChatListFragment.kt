@@ -19,12 +19,14 @@ import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.chat.ChatRoomAdapter
 import com.chrome.chattingapp.chat.ChatRoom
 import com.chrome.chattingapp.chat.ChatRoomActivity
+import com.chrome.chattingapp.chat.MessageModel
 import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,12 +79,10 @@ class ChatListFragment : Fragment() {
         listView.setOnItemClickListener { parent, view, position, id ->
             val chatRoomId = chatRoomList!![position].chatRoomId
             val chatRoomName = chatRoomList!![position].roomName
-            val userList = chatRoomList!![position].userList
             val intent = Intent(requireActivity(), ChatRoomActivity::class.java)
 
             intent.putExtra("chatRoomId", chatRoomId)
             intent.putExtra("chatRoomName", chatRoomName)
-            intent.putExtra("userList", userList)
             startActivity(intent)
         }
 
@@ -117,7 +117,7 @@ class ChatListFragment : Fragment() {
             if(roomNameStr.isEmpty()) {
                 Toast.makeText(requireActivity(), "채팅방 이름을 입력해주세요", Toast.LENGTH_SHORT).show()
             }
-            if(roomNameStr.length > 12) {
+            else if(roomNameStr.length > 12) {
                 Toast.makeText(requireActivity(), "채팅방 이름은 12글자 미만으로 입력해주세요", Toast.LENGTH_SHORT).show()
             }
             else {
@@ -128,7 +128,7 @@ class ChatListFragment : Fragment() {
                             if (response.isSuccess) {
                                 Log.d("ChatListFragment", response.toString())
                                 val roomId = response.result
-                                val chatRoom = ChatRoom(roomId!!, roomNameStr, nickName)
+                                val chatRoom = ChatRoom(roomId!!, roomNameStr)
                                 Log.d("ChatRoom", chatRoom.toString())
                                 FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(roomId!!).setValue(chatRoom)
                                 withContext(Dispatchers.Main) {
@@ -177,10 +177,14 @@ class ChatListFragment : Fragment() {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 chatRoomList.clear()
-                for (datamModel in dataSnapshot.children) {
-                    val chatRoom = datamModel.getValue(ChatRoom::class.java)
-                    chatRoomList.add(chatRoom!!)
+                for (dataModel in dataSnapshot.children) {
+                    val chatRoom = dataModel.getValue(ChatRoom::class.java)
+                    if(chatRoom != null) {
+                        chatRoomList.add(chatRoom)
+                        getUnreadMessageCount(chatRoom.chatRoomId!!)
+                    }
                 }
+
                 listViewAdapter.notifyDataSetChanged()
             }
 
@@ -193,5 +197,36 @@ class ChatListFragment : Fragment() {
 
     private suspend fun getUserInfo(uid: String): BaseResponse<GetUserRes> {
         return RetrofitInstance.myPageApi.getUserInfo(uid)
+    }
+
+    private fun getUnreadMessageCount(chatRoomId : String) {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var count = 0
+                var lastMessage = ""
+                for (datamModel in dataSnapshot.children) {
+                    val uidList = datamModel.child("readerUids").getValue(object : GenericTypeIndicator<MutableMap<String, Boolean>>() {})
+
+                    if (uidList != null) {
+                        Log.d("readerUids", uidList.toString())
+                        if (!uidList.containsKey(FirebaseAuthUtils.getUid())) {
+                            // readerUid에 내 uid가 없으면
+                            count++
+                        }
+                    }
+                    val lastDataModel = datamModel.getValue(MessageModel::class.java)
+                    if(lastDataModel != null) {
+                        lastMessage = lastDataModel.contents
+                    }
+                }
+                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("unreadCount").setValue(count)
+                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("lastMessage").setValue(lastMessage)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.w("MyMessage", "onCancelled", databaseError.toException())
+            }
+        }
+        FirebaseRef.message.child(chatRoomId).addValueEventListener(postListener)
     }
 }

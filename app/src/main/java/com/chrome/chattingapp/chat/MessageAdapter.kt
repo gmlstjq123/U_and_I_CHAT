@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,8 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
         val dateTime : TextView = view.findViewById(R.id.dateTime)
         val nickName : TextView = view.findViewById(R.id.messageNickName)
         val profile : ImageView = view.findViewById(R.id.messageProfileArea)
+        val unreadUserContainer : FrameLayout = view.findViewById(R.id.unreadUserCountContainer)
+        val unreadUserCount : TextView = view.findViewById(R.id.unreadUserCountTextView)
     }
 
     class ItemViewHolder2(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -28,6 +31,8 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
         val dateTime : TextView = view.findViewById(R.id.dateTime2)
         val nickName : TextView = view.findViewById(R.id.messageNickName2)
         val profile : ImageView = view.findViewById(R.id.messageProfileArea2)
+        val unreadUserContainer : FrameLayout = view.findViewById(R.id.unreadUserCountContainer2)
+        val unreadUserCount : TextView = view.findViewById(R.id.unreadUserCountTextView2)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -53,6 +58,17 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 (holder as ItemViewHolder1).contents.text = item.contents
                 holder.dateTime.text = item.sendTime
                 holder.nickName.text = item.senderNickName
+                holder.unreadUserCount.text = item.unreadUserCount.toString()
+
+
+                if (item.unreadUserCount.toString().toInt() > 0) {
+                    holder.unreadUserContainer!!.visibility = View.VISIBLE
+                    holder.unreadUserCount.visibility = View.VISIBLE
+                } else {
+                    holder.unreadUserContainer!!.visibility = View.GONE
+                    holder.unreadUserCount.visibility = View.GONE
+                }
+
                 if (item.senderProfileUrl != "null") {
                     Glide.with(context)
                         .load(item.senderProfileUrl)
@@ -66,6 +82,16 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 (holder as ItemViewHolder2).contents.text = item.contents
                 holder.dateTime.text = item.sendTime
                 holder.nickName.text = item.senderNickName
+                holder.unreadUserCount.text = item.unreadUserCount.toString()
+
+                if (item.unreadUserCount.toString().toInt() > 0) {
+                    holder.unreadUserContainer!!.visibility = View.VISIBLE
+                    holder.unreadUserCount.visibility = View.VISIBLE
+                } else {
+                    holder.unreadUserContainer!!.visibility = View.GONE
+                    holder.unreadUserCount.visibility = View.GONE
+                }
+
                 if (item.senderProfileUrl != "null") {
                     Glide.with(context)
                         .load(item.senderProfileUrl)

@@ -6,25 +6,55 @@
     android:background="@drawable/list_border"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/lvChatRoomName"
-        android:text="ChatRoom Name"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:textSize="30sp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/lvChatRoomName"
+            android:text="ChatRoom Name"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <FrameLayout
+            android:id="@+id/unreadMessageContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:visibility="gone"
+            android:background="@drawable/message_box">
+
+            <TextView
+                android:id="@+id/unreadMessageCountTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:gravity="center"
+                android:layout_marginHorizontal="8dp"
+                android:layout_marginVertical="5dp"
+                android:textSize="20sp"
+                android:textColor="#000000" />
+
+        </FrameLayout>
+
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/lvUserListArea"
-        android:text="User List"
-        android:textSize="20sp"
-        android:layout_marginLeft="40dp"
+        android:id="@+id/lvLastMessageArea"
+        android:text="Last Message"
+        android:textSize="15sp"
+        android:layout_marginHorizontal="40dp"
         android:layout_marginBottom="20dp"
-        android:layout_width="wrap_content"
+        android:maxHeight="100dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
 </LinearLayout>

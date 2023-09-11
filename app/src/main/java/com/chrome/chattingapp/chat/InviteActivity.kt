@@ -39,7 +39,6 @@ class InviteActivity : AppCompatActivity() {
 
         val chatRoomId = intent.getStringExtra("chatRoomId")
         val chatRoomName = intent.getStringExtra("chatRoomName")
-        val nickNameList = intent.getStringExtra("nickNameList")
 
         // userProfileList 초기화는 API 응답 이후에 수행
         getAccessToken { accessToken ->
@@ -57,8 +56,7 @@ class InviteActivity : AppCompatActivity() {
                             adapter.notifyDataSetChanged()
                             Log.d("UserProfileList", userProfileList.toString())
                             listview.setOnItemClickListener { parent, view, position, id ->
-                                val newNickNameList = nickNameList + ", " + userProfileList!![position].nickName
-                                val chatRoom = ChatRoom(chatRoomId, chatRoomName, newNickNameList)
+                                val chatRoom = ChatRoom(chatRoomId, chatRoomName)
                                 val invitedUid = userProfileList!![position].uid
                                 Log.d("ChatRoom", chatRoom.toString())
                                 FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId!!).setValue(chatRoom)
@@ -66,7 +64,6 @@ class InviteActivity : AppCompatActivity() {
                                 val intent = Intent(this@InviteActivity, ChatRoomActivity::class.java)
                                 intent.putExtra("chatRoomId", chatRoomId)
                                 intent.putExtra("chatRoomName", chatRoomName)
-                                intent.putExtra("userList", newNickNameList)
                                 intent.putExtra("invitedUid", invitedUid)
 
                                 CoroutineScope(Dispatchers.IO).launch {

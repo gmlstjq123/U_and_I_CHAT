@@ -6,6 +6,8 @@ data class MessageModel (
     val senderProfileUrl : String = "",
     val contents : String = "",
     val sendTime : String = "",
+    val readerUids: MutableMap<String, Boolean> = mutableMapOf(), // 메시지 읽은 유저의 UID
+    var unreadUserCount : Int = 0, // 메시지를 읽지 않은 사람의 수
     var viewType: Int = VIEW_TYPE_ME
 ) {
     companion object {

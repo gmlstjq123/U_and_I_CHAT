@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "628742733223",
-    "project_id": "chatting-ade84",
-    "storage_bucket": "chatting-ade84.appspot.com"
+    "project_number": "1091219111066",
+    "project_id": "chatting-3a583",
+    "storage_bucket": "chatting-3a583.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:628742733223:android:465c9748a3ef71ec874a82",
+        "mobilesdk_app_id": "1:1091219111066:android:a128f031e79f1c6da83323",
         "android_client_info": {
           "package_name": "com.chrome.chattingapp"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "628742733223-u8hekkcd5jg4p8bri2tq58tudo68rn4m.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD9laMs2l05QJqVneTAVupCQt9T69DOKvg"
+          "current_key": "AIzaSyD6b-wtByhl9SZqoJXQ_P4OtDW7YNuupKA"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "628742733223-u8hekkcd5jg4p8bri2tq58tudo68rn4m.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

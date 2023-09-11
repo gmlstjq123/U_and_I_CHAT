@@ -143,12 +143,12 @@ class ProfileActivity : AppCompatActivity() {
     private suspend fun modifyProfile(accessToken : String, uri: Uri?): BaseResponse<String> {
         // Create a RequestBody from the image file
         val imagePath = getImagePathFromUri(uri!!)
-        val imageFile = File(imagePath)
+        val imageFile = imagePath?.let { File(it) }
         Log.d("ProfileActivity", "path : " + imagePath.toString())
         Log.d("ProfileActivity", "file : " + imageFile.toString())
 
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
-        val imagePart = MultipartBody.Part.createFormData("image", imageFile.name, requestFile)
+        val imagePart = MultipartBody.Part.createFormData("image", imageFile?.name, requestFile)
 
         return RetrofitInstance.myPageApi.modifyProfile(accessToken, imagePart)
     }
