@@ -33,6 +33,7 @@
                 android:layout_marginHorizontal="35dp"
                 android:layout_marginTop="120dp"
                 android:gravity="center"
+                android:textStyle="bold"
                 android:text='회원 탈퇴를 원하시면,\n"I agree"를 입력해주세요.'
                 android:textColor="@color/black"
                 android:textSize="25sp"

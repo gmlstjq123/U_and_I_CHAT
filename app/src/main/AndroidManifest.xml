@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    d
 
     <application
         android:allowBackup="true"
@@ -16,6 +15,10 @@
         android:theme="@style/Theme.ChattingApp"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <activity
+            android:name=".friend.MyProfileActivity"
+            android:exported="false" />
 
         <service
             android:name=".push.FirebaseService"

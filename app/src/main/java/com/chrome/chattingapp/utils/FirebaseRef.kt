@@ -9,5 +9,6 @@ class FirebaseRef {
         val userInfo = database.getReference("userInfo")
         val chatRoom = database.getReference("chatRoom")
         val message = database.getReference("message")
+        val connected = database.getReference("connected")
     }
 }

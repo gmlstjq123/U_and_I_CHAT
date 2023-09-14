@@ -18,6 +18,7 @@ import com.chrome.chattingapp.api.BaseResponse
 import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.api.dto.UserProfile
+import com.chrome.chattingapp.friend.MyProfileActivity
 import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.utils.FirebaseAuthUtils
 import com.chrome.chattingapp.utils.FirebaseRef
@@ -40,7 +41,8 @@ class UserListFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_user_list, container, false)
-        lateinit var nickname: String
+        var nickname: String? = null
+        var profileUrl: String? = null
         val myProfile = view.findViewById<ImageView>(R.id.profileArea)
         val myNickName = view.findViewById<TextView>(R.id.nickNameArea)
 
@@ -53,7 +55,7 @@ class UserListFragment : Fragment() {
                     myNickName.text = nickname
                 }
                 if (response.result?.imgUrl != null) {
-                    val profileUrl = response.result?.imgUrl
+                    profileUrl = response.result?.imgUrl
                     val profileUri = Uri.parse(profileUrl)
                     withContext(Dispatchers.Main) {
                         Glide.with(requireActivity())
@@ -64,6 +66,16 @@ class UserListFragment : Fragment() {
             } else {
                 Log.d("UserListFragment", "유저의 정보를 불러오지 못함")
             }
+        }
+
+        val myProfileLayout = view.findViewById<LinearLayout>(R.id.myProfileLayout)
+        myProfileLayout.setOnClickListener {
+            val myImgUrl = profileUrl
+            val myNickName = nickname
+            val intent = Intent(requireActivity(), MyProfileActivity::class.java)
+            intent.putExtra("imgUrl", myImgUrl)
+            intent.putExtra("nickName", myNickName)
+            startActivity(intent)
         }
 
         // userProfileList 초기화는 API 응답 이후에 수행
@@ -82,9 +94,11 @@ class UserListFragment : Fragment() {
                             adapter.notifyDataSetChanged()
                             Log.d("UserProfileList", userProfileList.toString())
                             listview.setOnItemClickListener { parent, view, position, id ->
+                                val uid = userProfileList!![position].uid
                                 val imgUrl = userProfileList!![position].imgUrl
                                 val nickName = userProfileList!![position].nickName
                                 val intent = Intent(requireActivity(), UserDetailActivity::class.java)
+                                intent.putExtra("uid", uid)
                                 intent.putExtra("imgUrl", imgUrl)
                                 intent.putExtra("nickName", nickName)
                                 startActivity(intent)

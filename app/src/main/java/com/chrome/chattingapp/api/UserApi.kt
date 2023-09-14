@@ -11,6 +11,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface UserApi {
     @POST("/users")
@@ -28,6 +29,11 @@ interface UserApi {
     suspend fun checkExpiration(
         @Header("Authorization") accessToken : String
     ) : BaseResponse<Boolean>
+
+    @GET("/users/uidToToken")
+    suspend fun getDeviceTokenByUid(
+        @Query("uid") uid : String
+    ) : BaseResponse<String>
 
     @POST("/users/reissue-token")
     suspend fun reissueToken(@Body postReissueReq: PostReissueReq) : BaseResponse<String>

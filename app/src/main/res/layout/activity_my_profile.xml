@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/main_border"
-    tools:context=".friend.UserDetailActivity">
+    tools:context=".friend.MyProfileActivity">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/profileDetail"
+        android:id="@+id/myProfileDetail"
         android:layout_width="250dp"
         android:layout_height="250dp"
         android:src="@drawable/profile"
@@ -21,10 +21,10 @@
         app:civ_border_width="1dp" />
 
     <TextView
-        android:id="@+id/nickNameDetail"
+        android:id="@+id/myNickNameDetail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="335dp"
         android:text="NickName"
         android:textStyle="bold"
         android:textColor="#000000"
@@ -36,11 +36,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/startChat"
+        android:id="@+id/modifyProfile"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginBottom="100dp"
-        android:src="@drawable/splash"
+        android:src="@drawable/mypage"
+        android:layout_marginBottom="120dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -50,12 +50,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="채팅하기"
+        android:text="프로필 변경하기"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:layout_marginTop="3dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/startChat" />
+        app:layout_constraintTop_toBottomOf="@+id/modifyProfile" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+

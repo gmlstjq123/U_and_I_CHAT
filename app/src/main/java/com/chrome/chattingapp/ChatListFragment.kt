@@ -10,12 +10,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ListView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.chrome.chattingapp.api.BaseResponse
 import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
+import com.chrome.chattingapp.api.dto.UserProfile
 import com.chrome.chattingapp.chat.ChatRoomAdapter
 import com.chrome.chattingapp.chat.ChatRoom
 import com.chrome.chattingapp.chat.ChatRoomActivity
@@ -86,6 +90,11 @@ class ChatListFragment : Fragment() {
             startActivity(intent)
         }
 
+        listView.setOnItemLongClickListener { parent, view, position, id ->
+            showExitDialog(chatRoomList!![position].chatRoomId!!, chatRoomList!![position].roomName!!)
+            return@setOnItemLongClickListener(true)
+        }
+
         val plusBtn = view.findViewById<ImageView>(R.id.plus)
         plusBtn.setOnClickListener {
             showDialog()
@@ -153,6 +162,57 @@ class ChatListFragment : Fragment() {
         }
     }
 
+    private fun showExitDialog(roomId : String, roomName : String) {
+        val dialogView = LayoutInflater.from(requireActivity()).inflate(R.layout.exit_room_dialog, null)
+        val builder = AlertDialog.Builder(requireActivity())
+            .setView(dialogView)
+            .setTitle("채팅방 나가기")
+        val alertDialog = builder.show()
+        val roomNameArea = alertDialog.findViewById<TextView>(R.id.roomNameArea)
+        roomNameArea.text = roomName
+        val exitBtn = alertDialog.findViewById<Button>(R.id.exit)
+        val cancelBtn = alertDialog.findViewById<Button>(R.id.exitCancel)
+
+        exitBtn.setOnClickListener {
+                getAccessToken { accessToken ->
+                    if (accessToken.isNotEmpty()) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val response = exitChatRoom(accessToken, roomId)
+                            if (response.isSuccess) {
+                                Log.d("ChatListFragment", response.toString())
+                                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(roomId!!).removeValue()
+                                    .addOnCompleteListener { removeChatRoomTask ->
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            val response = getUserCount(roomId!!)
+                                            Log.d("userCount", response.toString())
+                                            if (!response.isSuccess) {
+                                                // 채팅방 안에 아무도 없다.(채팅방 ID가 존재하지 않는 채팅방을 가리킨다.)
+                                                FirebaseRef.message.child(roomId!!).removeValue()
+                                            }
+                                        }
+                                    }
+                            }
+                            else {
+                                Log.d("ChatListFragment", "채팅방 나가기 실패")
+                                val message = response.message
+                                Log.d("ChatListFragment", message)
+                                withContext(Dispatchers.Main) {
+                                    Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    } else {
+                        Log.e("ChatListFragment", "Invalid Token")
+                    }
+                }
+                Toast.makeText(requireActivity(), "채팅방을 나갑니다", Toast.LENGTH_SHORT).show()
+                alertDialog.dismiss()
+            }
+        cancelBtn.setOnClickListener {
+            alertDialog.dismiss()
+        }
+    }
+
     private suspend fun createChatRoom(accessToken : String, roomName : String): BaseResponse<String> {
         return RetrofitInstance.chatApi.createChatRoom(accessToken, roomName)
     }
@@ -181,7 +241,9 @@ class ChatListFragment : Fragment() {
                     val chatRoom = dataModel.getValue(ChatRoom::class.java)
                     if(chatRoom != null) {
                         chatRoomList.add(chatRoom)
-                        getUnreadMessageCount(chatRoom.chatRoomId!!)
+                        if (chatRoom.chatRoomId != null) {
+                            getUnreadMessageCount(chatRoom.chatRoomId)
+                        }
                     }
                 }
 
@@ -195,8 +257,20 @@ class ChatListFragment : Fragment() {
         FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).addValueEventListener(postListener)
     }
 
+    private suspend fun getUserList(roomId: String) : BaseResponse<List<UserProfile>> {
+        return RetrofitInstance.chatApi.getUserList(roomId)
+    }
+
+    private suspend fun getUserCount(roomId: String) : BaseResponse<String> {
+        return RetrofitInstance.chatApi.getUserCount(roomId)
+    }
+
     private suspend fun getUserInfo(uid: String): BaseResponse<GetUserRes> {
         return RetrofitInstance.myPageApi.getUserInfo(uid)
+    }
+
+    private suspend fun exitChatRoom(accessToken : String, roomId: String): BaseResponse<String> {
+        return RetrofitInstance.chatApi.exitChatRoom(accessToken, roomId)
     }
 
     private fun getUnreadMessageCount(chatRoomId : String) {
@@ -219,8 +293,23 @@ class ChatListFragment : Fragment() {
                         lastMessage = lastDataModel.contents
                     }
                 }
-                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("unreadCount").setValue(count)
-                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("lastMessage").setValue(lastMessage)
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response = getUserList(chatRoomId!!)
+                    if (response.isSuccess) {
+                        val participantsList = response.result
+                        Log.d("participantsList", participantsList.toString())
+                        for(participant in participantsList!!) {
+                            if(participant.uid == FirebaseAuthUtils.getUid()) { // 내가 이 채팅방에 존재할 때만 실행
+                                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("unreadCount").setValue(count)
+                                FirebaseRef.chatRoom.child(FirebaseAuthUtils.getUid()).child(chatRoomId).child("lastMessage").setValue(lastMessage)
+                            }
+                        }
+                    } else {
+                        val message = response.message
+                        Log.d("ChatListFragment", message)
+                    }
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

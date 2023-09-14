@@ -1,22 +1,19 @@
 package com.chrome.chattingapp.chat
 
 import android.content.Context
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.chrome.chattingapp.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class MessageAdapter(private val context: Context, val items: MutableList<MessageModel>)
     : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
     class ItemViewHolder1(private val view: View) : RecyclerView.ViewHolder(view) {
         val contents : TextView = view.findViewById(R.id.messageContentsArea)
         val dateTime : TextView = view.findViewById(R.id.dateTime)
@@ -60,7 +57,6 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 holder.nickName.text = item.senderNickName
                 holder.unreadUserCount.text = item.unreadUserCount.toString()
 
-
                 if (item.unreadUserCount.toString().toInt() > 0) {
                     holder.unreadUserContainer!!.visibility = View.VISIBLE
                     holder.unreadUserCount.visibility = View.VISIBLE
@@ -75,6 +71,9 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                         .into(holder.profile)
                 } else {
                     holder.profile.setImageResource(R.drawable.profile)
+                }
+                holder.itemView.setOnClickListener {
+                    itemClickListener.onClick(it, position)
                 }
             }
 
@@ -99,6 +98,9 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 } else {
                     holder.profile.setImageResource(R.drawable.profile)
                 }
+                holder.itemView.setOnClickListener {
+                    itemClickListener.onClick(it, position)
+                }
             }
         }
     }
@@ -110,4 +112,14 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
     override fun getItemViewType(position: Int): Int {
         return items[position].viewType
     }
+
+    interface  OnItemClickListener {
+        fun onClick(view : View, position : Int)
+    }
+
+    fun setItemClickListener(onItemClickListener: OnItemClickListener) {
+        this.itemClickListener = onItemClickListener
+    }
+
+    private lateinit var itemClickListener : OnItemClickListener
 }

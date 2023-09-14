@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/list_border"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/listProfileArea"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:src="@drawable/profile"
         android:layout_marginVertical="10dp"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="20dp"
+        app:civ_border_color="@color/skyBlue"
+        app:civ_border_overlay="true"
+        app:civ_border_width="1dp" />
 
     <TextView
         android:id="@+id/listNickNameArea"

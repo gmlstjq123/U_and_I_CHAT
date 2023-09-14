@@ -9,6 +9,7 @@ import com.chrome.chattingapp.push.PushRepository
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Param
 import okhttp3.ResponseBody
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
@@ -36,5 +37,19 @@ interface ChatApi {
     suspend fun getUserStrList(@Path("roomId") roomId : String) : BaseResponse<String>
 
     @GET("/chat/tokenList/{roomId}")
-    suspend fun getTokenList(@Path("roomId") roomId : String) : BaseResponse<List<String>>
+    suspend fun getTokenList(
+        @Header("Authorization") accessToken : String,
+        @Path("roomId") roomId : String
+    ) : BaseResponse<List<String>>
+
+    @DELETE("/chat/room/{roomId}")
+    suspend fun exitChatRoom(
+        @Header("Authorization") accessToken : String,
+        @Path("roomId") roomId : String
+    ) : BaseResponse<String>
+
+    @GET("/chat/uidList/{roomId}")
+    suspend fun getUserUidList(
+        @Path("roomId") roomId : String
+    ) : BaseResponse<List<String>>
 }
