@@ -54,7 +54,9 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.1")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.1")
     implementation("com.github.bumptech.glide:glide:4.12.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0") //Circle ImageView
+    implementation("de.hdodenhof:circleimageview:3.1.0") // Circle ImageView
+    implementation("com.kakao.sdk:v2-user:2.10.0") // 카카오 소셜로그인
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

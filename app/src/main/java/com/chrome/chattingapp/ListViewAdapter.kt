@@ -38,6 +38,8 @@ class ListViewAdapter(private val context: Context, private val dataList : List<
             Glide.with(context)
                 .load(imgUri)
                 .into(listViewProfile!!)
+        } else {
+            listViewProfile!!.setImageResource(R.drawable.profile)
         }
 
         listViewText!!.text=dataList[position].nickName

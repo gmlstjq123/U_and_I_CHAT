@@ -15,6 +15,7 @@ class RetrofitInstance {
         val userApi = retrofit.create(UserApi::class.java)
         val myPageApi = retrofit.create(MyPageApi::class.java)
         val chatApi = retrofit.create(ChatApi::class.java)
+        val kakaoApi = retrofit.create(KakaoApi::class.java)
 
         private val noticeRetrofit by lazy {
             Retrofit.Builder()

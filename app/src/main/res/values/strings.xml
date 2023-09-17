@@ -2,4 +2,5 @@
     <string name="app_name">chatting app</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="kakao_app_key">448fddf092ac1130b0e73574e48a0eb9</string>
 </resources>

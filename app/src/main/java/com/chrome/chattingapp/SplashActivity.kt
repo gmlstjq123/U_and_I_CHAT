@@ -26,7 +26,6 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
         val uid = FirebaseAuthUtils.getUid()
         Log.d("uid", uid)
 
@@ -81,14 +80,14 @@ class SplashActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        else { // 유효하지 않은 토큰(ex. 위변조된 토큰, Redis 블랙토큰)의 접근 -> 로그인 페이지로 전환
+                        else { // 유효하지 않은 토큰(ex. 위변조된 토큰, Redis 블랙토큰)의 접근 -> 회원가입 페이지로 전환
                             Log.d("SplashActivity", "Invalid User")
                             val message = expirationChk.message
                             Log.d("SplashActivity", message)
                             withContext(Dispatchers.Main) {
                                 Toast.makeText(this@SplashActivity, message, Toast.LENGTH_SHORT).show()
                                 Handler().postDelayed({
-                                    startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                                    startActivity(Intent(this@SplashActivity, IntroActivity::class.java))
                                     finish()
                                 }, 2000)
                             }
@@ -98,7 +97,7 @@ class SplashActivity : AppCompatActivity() {
 
                 else {
                     Handler().postDelayed({
-                        startActivity(Intent(this, LoginActivity::class.java))
+                        startActivity(Intent(this, IntroActivity::class.java))
                         finish()
                     }, 2000)
                 }

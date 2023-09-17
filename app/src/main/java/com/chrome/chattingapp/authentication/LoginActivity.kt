@@ -64,37 +64,35 @@ class LoginActivity : AppCompatActivity() {
                 auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                                CoroutineScope(Dispatchers.IO).launch {
-                                    val response = loginUser(postLoginReq)
-                                    Log.d("LoginActivity", response.toString())
-                                    if (response.isSuccess) {
-                                        FirebaseMessaging.getInstance().token.addOnCompleteListener(
-                                            OnCompleteListener { task ->
-                                                if (!task.isSuccessful) {
-                                                    Log.w("MyToken", "Fetching FCM registration token failed", task.exception)
-                                                    return@OnCompleteListener
+                            CoroutineScope(Dispatchers.IO).launch {
+                                val response = loginUser(postLoginReq)
+                                Log.d("LoginActivity", response.toString())
+                                if (response.isSuccess) {
+                                    FirebaseMessaging.getInstance().token.addOnCompleteListener(
+                                        OnCompleteListener { task ->
+                                            if (!task.isSuccessful) {
+                                                Log.w("MyToken", "Fetching FCM registration token failed", task.exception)
+                                                return@OnCompleteListener
+                                            }
+                                            val deviceToken = task.result
+                                            val userInfo = UserInfo(uid, response.result?.userId,
+                                                deviceToken, response.result?.accessToken, response.result?.refreshToken)
+                                            Log.d("userInfo", userInfo.toString())
+                                            FirebaseRef.userInfo.child(uid).setValue(userInfo)
+                                            CoroutineScope(Dispatchers.IO).launch {
+                                                val postDeviceTokenReq = PostDeviceTokenReq(uid, deviceToken)
+                                                val response = saveDeviceToken(postDeviceTokenReq)
+                                                Log.d("DeviceToken", response.toString())
+                                                if (response.isSuccess) {
+                                                    Log.d("DeviceToken", "디바이스 토큰 저장 완료")
+                                                } else {
+                                                    Log.d("DeviceToken", "디바이스 토큰 저장 실패")
                                                 }
-                                                val deviceToken = task.result
-                                                val userInfo = UserInfo(uid, response.result?.userId,
-                                                    deviceToken, response.result?.accessToken, response.result?.refreshToken)
-                                                Log.d("userInfo", userInfo.toString())
-                                                FirebaseRef.userInfo.child(uid).setValue(userInfo)
-                                                CoroutineScope(Dispatchers.IO).launch {
-                                                    val postDeviceTokenReq = PostDeviceTokenReq(uid, deviceToken)
-                                                    val response = saveDeviceToken(postDeviceTokenReq)
-                                                    Log.d("DeviceToken", response.toString())
-                                                    if (response.isSuccess) {
-                                                        Log.d("DeviceToken", "디바이스 토큰 저장 완료")
-                                                    } else {
-                                                        Log.d("DeviceToken", "디바이스 토큰 저장 실패")
-                                                    }
-                                                }
-                                                val intent = Intent(this@LoginActivity, MainActivity::class.java)
-                                                startActivity(intent)
-                                            })
-
-                                        Log.d("LoginActivity", "로그인 완료")
-
+                                            }
+                                            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                                            startActivity(intent)
+                                        })
+                                    Log.d("LoginActivity", "로그인 완료")
                                 } else {
                                     // 로그인 실패 처리
                                     Log.d("LoginActivity", "로그인 실패")
