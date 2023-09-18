@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
@@ -57,6 +56,7 @@ dependencies {
     implementation("de.hdodenhof:circleimageview:3.1.0") // Circle ImageView
     implementation("com.kakao.sdk:v2-user:2.10.0") // 카카오 소셜로그인
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
+    implementation("com.github.chrisbanes:PhotoView:2.3.0") // 이미지 확대/축소
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
