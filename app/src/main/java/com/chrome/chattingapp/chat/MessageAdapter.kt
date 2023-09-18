@@ -32,6 +32,24 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
         val unreadUserCount : TextView = view.findViewById(R.id.unreadUserCountTextView2)
     }
 
+    class ItemViewHolder3(private val view: View) : RecyclerView.ViewHolder(view) {
+        val image : ImageView = view.findViewById(R.id.imageContentsArea)
+        val dateTime : TextView = view.findViewById(R.id.imageDateTime)
+        val nickName : TextView = view.findViewById(R.id.imageNickName)
+        val profile : ImageView = view.findViewById(R.id.imageProfileArea)
+        val unreadUserContainer : FrameLayout = view.findViewById(R.id.imageUnreadUserCountContainer)
+        val unreadUserCount : TextView = view.findViewById(R.id.imageUnreadUserCountTextView)
+    }
+
+    class ItemViewHolder4(private val view: View) : RecyclerView.ViewHolder(view) {
+        val image : ImageView = view.findViewById(R.id.imageContentsArea2)
+        val dateTime : TextView = view.findViewById(R.id.imageDateTime2)
+        val nickName : TextView = view.findViewById(R.id.imageNickName2)
+        val profile : ImageView = view.findViewById(R.id.imageProfileArea2)
+        val unreadUserContainer : FrameLayout = view.findViewById(R.id.imageUnreadUserCountContainer2)
+        val unreadUserCount : TextView = view.findViewById(R.id.imageUnreadUserCountTextView2)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val adapterLayout : View?
         return when(viewType) {
@@ -42,6 +60,14 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
             MessageModel.VIEW_TYPE_YOU -> {
                 adapterLayout = LayoutInflater.from(parent.context).inflate(R.layout.message_recycler_view_item2, parent, false)
                 ItemViewHolder2(adapterLayout)
+            }
+            MessageModel.VIEW_TYPE_ME_IMAGE -> {
+                adapterLayout = LayoutInflater.from(parent.context).inflate(R.layout.image_recycler_view_item, parent, false)
+                ItemViewHolder3(adapterLayout)
+            }
+            MessageModel.VIEW_TYPE_YOU_IMAGE -> {
+                adapterLayout = LayoutInflater.from(parent.context).inflate(R.layout.image_recycler_view_item2, parent, false)
+                ItemViewHolder4(adapterLayout)
             }
             else -> throw RuntimeException("Invalid View Type Error")
         }
@@ -72,8 +98,8 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 } else {
                     holder.profile.setImageResource(R.drawable.profile)
                 }
-                holder.itemView.setOnClickListener {
-                    itemClickListener.onClick(it, position)
+                holder.profile.setOnClickListener {
+                    profileClickListener.onClick(it, position)
                 }
             }
 
@@ -98,8 +124,81 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
                 } else {
                     holder.profile.setImageResource(R.drawable.profile)
                 }
-                holder.itemView.setOnClickListener {
-                    itemClickListener.onClick(it, position)
+                holder.profile.setOnClickListener {
+                    profileClickListener.onClick(it, position)
+                }
+            }
+
+            MessageModel.VIEW_TYPE_ME_IMAGE -> {
+                (holder as ItemViewHolder3).dateTime.text = item.sendTime
+                holder.nickName.text = item.senderNickName
+                holder.unreadUserCount.text = item.unreadUserCount.toString()
+
+                if(item.imageUrl != "null") {
+                    Glide.with(context)
+                        .load(item.imageUrl)
+                        .into(holder.image)
+                    holder.image.clipToOutline = true
+                } else {
+                    holder.profile.setImageResource(R.drawable.broken_image)
+                }
+                if (item.unreadUserCount.toString().toInt() > 0) {
+                    holder.unreadUserContainer!!.visibility = View.VISIBLE
+                    holder.unreadUserCount.visibility = View.VISIBLE
+                } else {
+                    holder.unreadUserContainer!!.visibility = View.GONE
+                    holder.unreadUserCount.visibility = View.GONE
+                }
+
+                if (item.senderProfileUrl != "null") {
+                    Glide.with(context)
+                        .load(item.senderProfileUrl)
+                        .into(holder.profile)
+                } else {
+                    holder.profile.setImageResource(R.drawable.profile)
+                }
+                holder.profile.setOnClickListener {
+                    profileClickListener.onClick(it, position)
+                }
+                holder.image.setOnClickListener {
+                    imageClickListener.onClick(it, position)
+                }
+            }
+
+            MessageModel.VIEW_TYPE_YOU_IMAGE -> {
+                (holder as ItemViewHolder4).dateTime.text = item.sendTime
+                holder.nickName.text = item.senderNickName
+                holder.unreadUserCount.text = item.unreadUserCount.toString()
+
+                if (item.unreadUserCount.toString().toInt() > 0) {
+                    holder.unreadUserContainer!!.visibility = View.VISIBLE
+                    holder.unreadUserCount.visibility = View.VISIBLE
+                } else {
+                    holder.unreadUserContainer!!.visibility = View.GONE
+                    holder.unreadUserCount.visibility = View.GONE
+                }
+
+                if (item.senderProfileUrl != "null") {
+                    Glide.with(context)
+                        .load(item.senderProfileUrl)
+                        .into(holder.profile)
+                } else {
+                    holder.profile.setImageResource(R.drawable.profile)
+                }
+
+                if(item.imageUrl != "null") {
+                    Glide.with(context)
+                        .load(item.imageUrl)
+                        .into(holder.image)
+                    holder.image.clipToOutline = true
+                } else {
+                    holder.profile.setImageResource(R.drawable.broken_image)
+                }
+                holder.profile.setOnClickListener {
+                    profileClickListener.onClick(it, position)
+                }
+                holder.image.setOnClickListener {
+                    imageClickListener.onClick(it, position)
                 }
             }
         }
@@ -117,9 +216,14 @@ class MessageAdapter(private val context: Context, val items: MutableList<Messag
         fun onClick(view : View, position : Int)
     }
 
-    fun setItemClickListener(onItemClickListener: OnItemClickListener) {
-        this.itemClickListener = onItemClickListener
+    fun setProfileClickListener(onItemClickListener: OnItemClickListener) {
+        this.profileClickListener = onItemClickListener
     }
 
-    private lateinit var itemClickListener : OnItemClickListener
+    fun setImageClickListener(onItemClickListener: OnItemClickListener) {
+        this.imageClickListener = onItemClickListener
+    }
+
+    private lateinit var profileClickListener : OnItemClickListener
+    private lateinit var imageClickListener : OnItemClickListener
 }

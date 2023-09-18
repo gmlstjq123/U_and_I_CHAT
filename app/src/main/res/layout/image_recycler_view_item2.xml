@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageContentsArea2"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="37dp"
+            android:src="@drawable/broken_image"
+            android:background="@drawable/round_ractangle"
+            android:ellipsize="end"
+            android:maxWidth="230dp"
+            app:layout_constraintStart_toEndOf="@+id/imageProfileArea2"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <FrameLayout
+            android:id="@+id/imageUnreadUserCountContainer2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageContentsArea2">
+
+            <TextView
+                android:id="@+id/imageUnreadUserCountTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="20dp"
+                android:gravity="center"
+                android:text="10"
+                android:textColor="#ffd400"
+                android:textSize="10sp" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/imageDateTime2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9/7 7:01 AM"
+            android:textSize="10sp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="15dp"
+            app:layout_constraintStart_toEndOf="@+id/imageProfileArea2"
+            app:layout_constraintTop_toBottomOf="@+id/imageContentsArea2" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imageProfileArea2"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="15dp"
+            android:src="@drawable/profile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:civ_border_color="@color/skyBlue"
+            app:civ_border_overlay="true"
+            app:civ_border_width="1dp" />
+
+
+        <TextView
+            android:id="@+id/imageNickName2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="2dp"
+            android:gravity="center"
+            android:text="nickname"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toTopOf="@+id/imageContentsArea2"
+            app:layout_constraintStart_toEndOf="@+id/imageProfileArea2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>

@@ -4,9 +4,11 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -14,6 +16,8 @@ import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
@@ -28,6 +32,7 @@ import com.chrome.chattingapp.api.RetrofitInstance
 import com.chrome.chattingapp.api.dto.GetUserRes
 import com.chrome.chattingapp.api.dto.UserProfile
 import com.chrome.chattingapp.friend.MyProfileActivity
+import com.chrome.chattingapp.friend.ProfileImageActivity
 import com.chrome.chattingapp.friend.UserDetailActivity
 import com.chrome.chattingapp.push.NoticeModel
 import com.chrome.chattingapp.push.PushNotice
@@ -44,6 +49,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -118,7 +127,7 @@ class ChatRoomActivity : AppCompatActivity() {
         recyclerView.adapter = messageAdapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        messageAdapter.setItemClickListener(object : MessageAdapter.OnItemClickListener {
+        messageAdapter.setProfileClickListener(object : MessageAdapter.OnItemClickListener {
             override fun onClick(view: View, position: Int) {
                 val uid = messageList!![position].senderUid
                 val imgUrl = messageList!![position].senderProfileUrl
@@ -136,6 +145,15 @@ class ChatRoomActivity : AppCompatActivity() {
                     intent.putExtra("imgUrl", imgUrl)
                     intent.putExtra("nickName", nickName)
                 }
+                startActivity(intent)
+            }
+        })
+
+        messageAdapter.setImageClickListener(object : MessageAdapter.OnItemClickListener {
+            override fun onClick(view: View, position: Int) {
+                val imgUrl = messageList!![position].imageUrl
+                val intent = Intent(this@ChatRoomActivity, ProfileImageActivity::class.java)
+                intent.putExtra("imgUrl", imgUrl)
                 startActivity(intent)
             }
         })
@@ -159,6 +177,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
         val message = findViewById<TextInputEditText>(R.id.message)
         val sendBtn = findViewById<ImageView>(R.id.send)
+        val sendImageBtn = findViewById<ImageView>(R.id.send_image)
 
         lateinit var myNickName : String
         lateinit var myProfileUrl : String
@@ -252,6 +271,105 @@ class ChatRoomActivity : AppCompatActivity() {
                 message.text?.clear()
             }
         }
+
+        val getAction = registerForActivityResult(
+            ActivityResultContracts.GetContent(),
+            ActivityResultCallback { uri ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    val response = uploadImage(uri)
+                    if (response.isSuccess) {
+                        val selectedImageUri = response.result!!
+                        Log.d("selectedImageUri", selectedImageUri)
+                        val sendTime = getSendTime()
+                        CoroutineScope(Dispatchers.IO).launch {
+                            val response = getUserInfo(myUid)
+                            if (response.isSuccess) {
+                                myNickName = response.result?.nickName.toString()
+                                myProfileUrl = response.result?.imgUrl.toString()
+                                val readerUids = mutableMapOf<String, Boolean>()
+                                Log.d("selectedImageUriChk", selectedImageUri)
+                                messageModel = MessageModel(myUid, myNickName, myProfileUrl, "이미지",
+                                    sendTime, readerUids, 0, selectedImageUri)
+                                Log.d("readerUid", readerUids.size.toString())
+                                FirebaseRef.message.child(chatRoomId!!).push().setValue(messageModel)
+
+                                val connectedUidsRef = FirebaseRef.connected.child(chatRoomId!!)
+                                val connectedUidsList: MutableList<String> = mutableListOf() // 현재 접속 중인 유저의 UID 목록
+
+                                connectedUidsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                                        for (childSnapshot in dataSnapshot.children) { // 난수 값
+                                            val originalString = childSnapshot.value.toString()
+                                            Log.d("originalString", originalString)
+                                            // originalString이 {sRuRu1YVJMSj4csAUPOmaFfKfWJ2=true}와 같이 나오므로,
+                                            // 앞에서 1글자, 뒤에서 6글자를 제거해 UID만 추출
+                                            val modifiedString = originalString.substring(1, originalString.length - 6)
+                                            Log.d("modifiedString", modifiedString)
+                                            connectedUidsList.add(modifiedString)
+                                            Log.d("connectedUidsList", connectedUidsList.toString())
+                                        }
+
+                                        CoroutineScope(Dispatchers.IO).launch {
+                                            val response = getUserUidList(chatRoomId!!) // 채팅방에 참여한 모든 유저의 UID 목록
+                                            Log.d("userUidList", response.toString())
+                                            if (response.isSuccess) {
+                                                val uidList = response.result!!
+                                                Log.d("userUidList", response.result.toString())
+                                                Log.d("userUidList", uidList.toString())
+
+                                                val difference = uidList.subtract(connectedUidsList) // 차집합 List
+                                                Log.d("difference", connectedUidsList.toString())
+                                                Log.d("difference", difference.toString())
+                                                val deviceTokenList = mutableListOf<String>()
+
+                                                val addList = difference.map { uid ->
+                                                    async(Dispatchers.IO) {
+                                                        val response = getDeviceTokenByUid(uid)
+                                                        if (response.isSuccess) {
+                                                            deviceTokenList.add(response.result.toString())
+                                                        } else {
+                                                            Log.d("ChatRoomActivity", "디바이스 토큰 정보를 불러오지 못함")
+                                                        }
+                                                    }
+                                                }
+
+                                                // 모든 작업이 완료될 때까지 대기
+                                                addList.awaitAll()
+
+                                                Log.d("deviceTokenList", deviceTokenList.toString())
+                                                val noticeModel = NoticeModel(myNickName, "이미지 파일")
+                                                for (token in deviceTokenList) {
+                                                    val pushNotice = PushNotice(noticeModel, token)
+                                                    Log.d("Push", pushNotice.toString())
+                                                    Log.d("Push", tokenList.toString())
+                                                    createNotificationChannel()
+                                                    pushNotification(pushNotice)
+                                                }
+                                            } else {
+                                                Log.d("userUidList", "유저의 정보를 불러오지 못함")
+                                            }
+                                        }
+                                    }
+
+                                    override fun onCancelled(databaseError: DatabaseError) {
+                                        // 처리 중 오류 발생 시 처리
+                                    }
+                                })
+                            } else {
+                                Log.d("ChatRoomActivity", "유저의 정보를 불러오지 못함")
+                            }
+                        }
+                        message.text?.clear()
+                    } else {
+                        Log.d("ChatRoomActivity", "이미지 정보를 불러오지 못함")
+                    }
+                }
+            }
+        )
+
+        sendImageBtn.setOnClickListener {
+            getAction.launch("image/*")
+        }
     }
 
     override fun onPause() {
@@ -309,6 +427,28 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private suspend fun getUserCount(roomId: String) : BaseResponse<String> {
         return RetrofitInstance.chatApi.getUserCount(roomId)
+    }
+
+    private suspend fun uploadImage(uri: Uri?) : BaseResponse<String> {
+        val imagePath = getImagePathFromUri(uri!!)
+        val imageFile = imagePath?.let { File(it) }
+        Log.d("ProfileActivity", "path : " + imagePath.toString())
+        Log.d("ProfileActivity", "file : " + imageFile.toString())
+
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
+        val imagePart = MultipartBody.Part.createFormData("image", imageFile?.name, requestFile)
+
+        return RetrofitInstance.chatApi.uploadImage(imagePart)
+    }
+
+    private fun getImagePathFromUri(uri: Uri): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+        cursor?.moveToFirst()
+        val columnIndex = cursor?.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        val imagePath = cursor?.getString(columnIndex!!)
+        cursor?.close()
+        return imagePath
     }
 
     private suspend fun getUserInfo(uid: String): BaseResponse<GetUserRes> {
@@ -402,11 +542,14 @@ class ChatRoomActivity : AppCompatActivity() {
                                 }
                         }
 
-                        if (messageModel.senderUid != FirebaseAuthUtils.getUid()) {
+                        if (messageModel.senderUid != FirebaseAuthUtils.getUid() && messageModel.imageUrl == "null") {
                             messageModel.viewType = MessageModel.VIEW_TYPE_YOU
-                            if(!connectedUids.containsKey(FirebaseAuthUtils.getUid())) {
-
-                            }
+                        }
+                        else if (messageModel.senderUid == FirebaseAuthUtils.getUid() && messageModel.imageUrl != "null") {
+                            messageModel.viewType = MessageModel.VIEW_TYPE_ME_IMAGE
+                        }
+                        else if(messageModel.senderUid != FirebaseAuthUtils.getUid() && messageModel.imageUrl != "null") {
+                            messageModel.viewType = MessageModel.VIEW_TYPE_YOU_IMAGE
                         }
                         newMessages.add(messageModel)
                     }
