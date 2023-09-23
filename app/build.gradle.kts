@@ -34,6 +34,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures{
+        dataBinding = true
+    }
 }
 
 dependencies {
@@ -57,6 +60,7 @@ dependencies {
     implementation("com.kakao.sdk:v2-user:2.10.0") // 카카오 소셜로그인
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.1")
     implementation("com.github.chrisbanes:PhotoView:2.3.0") // 이미지 확대/축소
+    implementation("com.navercorp.nid:oauth:5.7.0") // 네이버 소셜로그인
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

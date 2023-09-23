@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.File
@@ -147,7 +148,7 @@ class ProfileActivity : AppCompatActivity() {
         Log.d("ProfileActivity", "path : " + imagePath.toString())
         Log.d("ProfileActivity", "file : " + imageFile.toString())
 
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), imageFile)
+        val requestFile = RequestBody.create("multipart/form-data".toMediaTypeOrNull(), imageFile!!)
         val imagePart = MultipartBody.Part.createFormData("image", imageFile?.name, requestFile)
 
         return RetrofitInstance.myPageApi.modifyProfile(accessToken, imagePart)

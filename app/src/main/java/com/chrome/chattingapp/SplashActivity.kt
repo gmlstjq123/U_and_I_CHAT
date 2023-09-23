@@ -63,10 +63,10 @@ class SplashActivity : AppCompatActivity() {
                                                     finish() }, 2000)
                                             }
                                         }
-                                        else { // 리프레시 토큰이 만료되었거나 유효하지 않은 경우 -> 로그인 페이지로 전환
+                                        else { // 리프레시 토큰이 만료되었거나 유효하지 않은 경우 -> 회원가입 페이지로 전환
                                             withContext(Dispatchers.Main) {
                                                 Toast.makeText(this@SplashActivity, "인증 토큰이 만료되어 로그인 후 이용 가능합니다", Toast.LENGTH_SHORT).show()
-                                                val intent = Intent(this@SplashActivity, LoginActivity::class.java)
+                                                val intent = Intent(this@SplashActivity, IntroActivity::class.java)
                                                 startActivity(intent)
                                             }
                                         }
