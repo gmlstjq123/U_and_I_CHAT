@@ -23,12 +23,10 @@ class MyProfileActivity : AppCompatActivity() {
         val nickNameTextView = findViewById<TextView>(R.id.myNickNameDetail)
         val toMyPageBtn = findViewById<ImageView>(R.id.modifyProfile)
 
-        if(imgUrl != null) {
-            if(imgUrl != "null") {
-                Glide.with(this)
-                    .load(imgUrl)
-                    .into(profileImageView)
-            }
+        if(imgUrl != "null") {
+            Glide.with(this)
+                .load(imgUrl)
+                .into(profileImageView)
         }
 
         nickNameTextView.text = nickName

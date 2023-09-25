@@ -33,7 +33,7 @@ class ListViewAdapter(private val context: Context, private val dataList : List<
         val listViewProfile = convertView?.findViewById<ImageView>(R.id.listProfileArea)
         val listViewText = convertView?.findViewById<TextView>(R.id.listNickNameArea)
         val imgUrl = dataList[position].imgUrl
-        if(imgUrl != null) {
+        if(imgUrl != "null") {
             val imgUri = Uri.parse(imgUrl)
             Glide.with(context)
                 .load(imgUri)

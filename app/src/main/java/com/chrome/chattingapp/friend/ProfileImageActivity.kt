@@ -17,7 +17,7 @@ class ProfileImageActivity : AppCompatActivity() {
         val imgUrl = intent.getStringExtra("imgUrl")
 
         val profileImageView = findViewById<PhotoView>(R.id.profileImage)
-        if(imgUrl != null) {
+        if(imgUrl != "null") {
             Glide.with(this)
                 .load(imgUrl)
                 .into(profileImageView)
