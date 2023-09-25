@@ -42,7 +42,7 @@ class UserDetailActivity : AppCompatActivity() {
         val nickNameTextView = findViewById<TextView>(R.id.nickNameDetail)
         val startChatBtn = findViewById<ImageView>(R.id.startChat)
 
-        if(imgUrl != "null") {
+        if(imgUrl != null && imgUrl != "null") {
             Glide.with(this)
                 .load(imgUrl)
                 .into(profileImageView)
